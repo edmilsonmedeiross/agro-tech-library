@@ -27,9 +27,11 @@ model book {
   description String
   releaseDate DateTime @map("release_date")
   authorId    Int      @map("author_id")
+  thumbnail   String
 
   categories category[]
-  author_fk author @relation(fields: [authorId], references: [id])
+  author_fk  author     @relation(fields: [authorId], references: [id])
+
   @@map("books")
 }
 
@@ -38,5 +40,6 @@ model category {
   name String
 
   books book[]
+
   @@map("categories")
 }
