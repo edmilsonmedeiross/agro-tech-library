@@ -1,3 +1,24 @@
+// prisma.ts
 import { PrismaClient } from '@prisma/client';
 
-export const prisma = new PrismaClient({log: ['query']});
+let prisma: PrismaClient;
+
+declare global {
+  namespace NodeJS {
+    interface Global {
+      prisma: PrismaClient;
+    }
+  }
+}
+
+const prismaInstance = () => {
+  if (!prisma) {
+    prisma = new PrismaClient({
+      log: ['query', 'info', 'warn'],
+    });
+  }
+
+  return prisma;
+};
+
+export default prismaInstance();
