@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "NODE_OPTIONS=\"--max-old-space-size=4096\" next dev",
-    "build": "next build",
+    "prisma:generate": "prisma generate",
+    "build": "npm run prisma:generate && npm run build",
     "start": "next start",
     "lint": "next lint"
   },
