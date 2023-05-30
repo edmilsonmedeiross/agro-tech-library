@@ -4,19 +4,23 @@ import { bookSchema } from '@/validations/bookSchema';
 
 export async function GET(request: NextRequest) {
   try {
+    await prisma.$connect();
     const page = Number(request.nextUrl.searchParams.get('page'));
-    console.log(page);
-    
 
-    const books = await prisma.book.findMany({
-      skip: (page - 1) * 10,
-      take: 10,
-      include: {
-        author_fk: true,
-        categories: true,
-      }
-    });
+    let books;
 
+    if (!page) {
+      books = await prisma.book.findMany();
+    } else {
+      books = await prisma.book.findMany({
+        skip: (page - 1) * 10,
+        take: 10,
+        include: {
+          author_fk: true,
+          categories: true,
+        }
+      });
+    }
     return NextResponse.json(books);
   } catch (err) {
     return NextResponse.json(err);

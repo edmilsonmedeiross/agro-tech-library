@@ -21,7 +21,6 @@ const RegisterAuthorForm = ({ setAuthorOptions }: { setAuthorOptions?: any }) =>
 
   const {
     control,
-    register,
     handleSubmit,
     formState: { errors },
   } = useForm<AuthorFormData>({

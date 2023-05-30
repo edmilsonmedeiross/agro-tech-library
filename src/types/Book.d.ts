@@ -1,4 +1,4 @@
 import {z} from 'zod';
-import { BookSchema } from '../validations/bookSchema';
+import { bookSchema } from '../validations/bookSchema';
 
-export type BookProps = z.infer<typeof BookSchema>
+export type BookProps = z.infer<typeof bookSchema>

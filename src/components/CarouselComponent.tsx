@@ -4,13 +4,14 @@ import React from 'react';
 import { Carousel } from 'antd';
 import { useAtom } from 'jotai';
 import { booksForRenderAtom } from '@/jotai/atoms';
+import Link from 'next/link';
 
 const contentStyle: React.CSSProperties = {
-  height: '160px',
-  color: '#fff',
+  height: '400px',
+  color: '#13111c',
   lineHeight: '160px',
   textAlign: 'center',
-  background: '#364d79',
+  background: '#059666',
 };
 
 function CarouselComponent () {
@@ -21,9 +22,11 @@ function CarouselComponent () {
     <div>
       <Carousel autoplay>
         {newBooksRender.map((book) => (
-          <div key={ book?.name }>
-            <h3 style={ contentStyle }>{book?.name}</h3>
-          </div>
+          <Link key={ book?.name } href={ `/dashboard/books/${book.id}` }>
+            <div>
+              <h1 style={ contentStyle }>{book?.name}</h1>
+            </div>
+          </Link>
         ))}
       </Carousel>
     </div>
