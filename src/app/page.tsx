@@ -1,14 +1,11 @@
 import CarouselComponent from '@/components/CarouselComponent';
 import PaginationComponent from '@/components/PaginationComponent';
-import { api } from '@/lib/api';
-import { BookProps } from '@/types/Book';
-import { AxiosResponse } from 'axios';
 import React from 'react';
 
 export default async function Home(): Promise<React.JSX.Element> {
   
   return (
-    <div>
+    <div className="flex flex-col justify-center w-screen h-screen bg-purple-900">
       <h1>Hello, Agro Tech!</h1>
       <CarouselComponent />
       <PaginationComponent />
