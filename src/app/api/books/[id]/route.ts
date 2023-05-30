@@ -2,8 +2,35 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '../../lib/prisma';
 import { bookSchema } from '@/validations/bookSchema';
 
+export async function GET(request: NextRequest, context: { params: { id: string } }) {
+  try {
+    const id = Number(context.params.id);
+    const book = await prisma.book.findFirst({
+      where: {
+        id,
+      },
+      include: {
+        author_fk: true,
+        categories: true,
+      }
+    });
+
+    if (!book) {
+      return NextResponse.json({ message: 'Livro não encontrado!' }, { status: 404 });
+    }
+
+    return NextResponse.json(book);
+  } catch (err) {
+    return NextResponse.json(err);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 export async function PUT(request: NextRequest, context: { params: { id: string } }) {
   try {
+    await prisma.$connect();
+
     const id = Number(context.params.id);
     const result = bookSchema.safeParse(await request.json());
 
@@ -18,7 +45,6 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
     });
   
     if (!existingBook) {
-    // Não existe um autor com o mesmo nome e data de nascimento
       return NextResponse.json({ message: 'Livro não encontrado!' }, { status: 404 });
     }
 
@@ -30,7 +56,7 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
       },
       data: {
         name,
-        authorId,
+        authorId: Number(authorId),
         description,
         releaseDate,
         thumbnail,
@@ -56,7 +82,6 @@ export async function DELETE(request: NextRequest, context: { params: { id: stri
     });
     
     if (!existingBook) {
-      // Não existe um autor com o mesmo nome e data de nascimento
       return NextResponse.json({ message: 'Livro não encontrado!' }, { status: 404 });
     }
   
