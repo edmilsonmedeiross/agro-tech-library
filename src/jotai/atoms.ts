@@ -1,5 +1,7 @@
-import { BookProps } from '@/types/Book';
+// import { BookCardProps } from '@/types/Book';
+import { type BookCardProps } from '@/components/BookCard';
 import { atom } from 'jotai';
 
-export const isVisibleAtom = atom(false);
-export const booksForRenderAtom = atom<BookProps[]>([]);
+export const isVisibleAtom = atom<boolean>(false);
+export const booksForRenderAtom = atom<BookCardProps[]>([]);
+export const isVisibleEditModalAtom = atom<boolean>(false);
