@@ -1,7 +1,7 @@
 import BookCard from '@/components/BookCard';
 import React from 'react';
-import { BookProps } from '@/types/Book';
-import { getBookById, getBooks } from '@/actions';
+// import { BookProps } from '@/types/Book';
+import { getBookById } from '@/actions';
 
 async function DetailsBook({ params }: { params: { id: string } }) {
   const book = await getBookById(Number(params.id));
@@ -13,9 +13,9 @@ async function DetailsBook({ params }: { params: { id: string } }) {
   );
 }
 
-export async function generateStaticParams() {
-  const books = await getBooks();
-  return books?.map((book: BookProps) => ({...book, id: String(book.id)}));
-}
+// export async function generateStaticParams() {
+//   const books = await getBooks();
+//   return books?.map((book: BookProps) => ({...book, id: String(book.id)}));
+// }
 
 export default DetailsBook;
