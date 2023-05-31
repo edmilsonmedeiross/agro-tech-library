@@ -4,9 +4,19 @@ export const bookSchema = z.object({
   id: z.string().optional(),
   name: z.string(),
   description: z.string(),
-  releaseDate: z.string(),
+  releaseDate: z
+  .coerce
+  .date()
+  .refine((date) => !isNaN(date.getTime()), {
+    message: 'A data de nascimento é inválida',
+  }),
   // author: z.string(),
   authorId: z.string(),
   thumbnail: z.string().url(),
-  category: z.string(),
+  categories: z.array(z.object({
+    id: z.string(),
+    name: z.string().optional(),
+  })).refine((categories) => categories.length, {
+    message: 'É necessário informar ao menos uma categoria',
+  })
 });

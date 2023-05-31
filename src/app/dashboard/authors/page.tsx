@@ -1,10 +1,10 @@
-import RegisterAlthorForm from '@/components/RegisterAuthorForm';
+import RegisterAuthorForm from '@/components/RegisterAuthorForm';
 import React from 'react';
 
 function authors() {
   return (
     <div>
-      <RegisterAlthorForm />
+      <RegisterAuthorForm />
     </div>
   );
 }

@@ -40,7 +40,6 @@ const RegisterAuthorForm = ({ setAuthorOptions }: { setAuthorOptions?: any }) =>
       .catch((err) => {
         console.error(err);
       });
-    
   };
 
   return (

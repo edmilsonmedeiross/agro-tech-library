@@ -1,59 +1,47 @@
 'use client';
-import { api } from '@/lib/api';
 import { AuthorProps } from '@/types/Author';
-import { BookProps } from '@/types/Book';
-import { Select } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import RegisterBookForm from './RegisterBookForm';
 import BookCard, { BookCardProps } from './BookCard';
+import SelectBooks from './SelectBooks';
+import { category } from '@prisma/client';
 
-function SearchBook(props: { books: BookProps[]}) {
-  const [booksOptions, _setBooksOptions] = useState(props.books || []);
-  const [bookForEdit, setBookForEdit] = useState<BookCardProps>();
-  const [authors, setAuthors] = useState<AuthorProps[]>([]);
+function SearchBook(props: {
+  books?: BookCardProps[],
+  authors: AuthorProps[] | undefined,
+  categoriesOpitions: category[] | undefined,
+  context?: string,
+  book?: BookCardProps | null,
+}) {
 
-  useEffect(() => {
-    const getAuthors = async () => {
-      const { data } = await api.get('/author');
-      setAuthors(data);
-    };
-
-    getAuthors();
-  }, []);
-
+  const [bookForEdit, setBookForEdit] = useState<BookCardProps | undefined>(props.book || undefined);
 
   const onChange = async (value: string) => {
     console.log(`selected ${value}`);
-
-    const book = await api.get(`/books/${value}`);
-    console.log(book);
-    setBookForEdit(book.data);
+    if (props.books) {
+      const book = props.books.find(({ id }) => id === value);
+      setBookForEdit(book);
+    }
   };
-  
-  const onSearch = (value: string) => {
-    console.log('search:', value);
-  };
-
 
   return (
-    <div className="self-center">
-      <Select
-        showSearch
-        placeholder="Selecione um livro ou pesquise por um"
-        optionFilterProp="children"
-        onChange={ onChange }
-        onSearch={ onSearch }
-        filterOption={ (input, option) =>
-          (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-        }
-        options={ booksOptions.map((book) => ({value: book.id, label: book.name})) }
-      />
-
+    <div>
+      { props.books &&
+        <SelectBooks
+          booksOptions={ props.books }
+          onChange={ onChange }
+        />
+      }
+      
       { bookForEdit && (
-
         <div>
           <BookCard book={ bookForEdit } />
-          <RegisterBookForm authors={ authors } book={ bookForEdit } context={ 'edit' } />
+          <RegisterBookForm
+            authors={ props.authors }
+            book={ bookForEdit }
+            context={ 'edit' }
+            categoriesOptions={ props.categoriesOpitions }
+          />
         </div>
       ) }
     </div>

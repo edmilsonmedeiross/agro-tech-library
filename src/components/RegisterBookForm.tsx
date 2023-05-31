@@ -1,80 +1,96 @@
 'use client';
-import React, { useState } from 'react';
+import { CheckCircleTwoTone, HomeOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useForm, Controller} from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AuthorProps } from '@/types/Author';
 import { bookSchema } from '@/validations/bookSchema';
-import { api } from '@/lib/api';
 import RegisterAuthorForm from './RegisterAuthorForm';
-import { useAtom } from 'jotai';
+import { createBook, updateBook } from '@/actions';
+import SelectCategories from './SelectCategories';
+import { type BookProps } from '@/types/Book';
 import { isVisibleAtom } from '@/jotai/atoms';
-import { Select, Tag, Input, DatePicker } from 'antd';
-import { BookOutlined, CheckCircleTwoTone, HomeOutlined } from '@ant-design/icons';
-import type { CustomTagProps } from 'rc-select/lib/BaseSelect';
 import RegisterButton from './RegisterButton';
+import { AuthorProps } from '@/types/Author';
+import SelectAuthors from './SelectAuthors';
+import { category } from '@prisma/client';
+import { Input, DatePicker } from 'antd';
+import React, { useState } from 'react';
+import { useAtom } from 'jotai';
 import Link from 'next/link';
-import { BookProps } from '@/types/Book';
 import dayjs from 'dayjs';
+
 
 const { TextArea } = Input;
 
-const tagRender = (props: CustomTagProps) => {
-  const { label, value, closable, onClose } = props;
-  const onPreventMouseDown = (event: React.MouseEvent<HTMLSpanElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
-  return (
-    <Tag
-      color={ value }
-      onMouseDown={ onPreventMouseDown }
-      closable={ closable }
-      onClose={ onClose }
-      style={ { marginRight: 3 } }
-    >
-      {label}
-    </Tag>
-  );
-};
-
 export const revalidate = 60 * 60 * 24; // 24 hours
 
-const RegisterBookForm = ({ authors, book, context }: {authors: AuthorProps[], book?: BookProps, context: string}) => {
-  const [authorOptions, setAuthorOptions] = useState(authors || []);
+const RegisterBookForm = ({
+  authors, book, categoriesOptions, context
+  }: {
+    authors?: AuthorProps[],
+    book?: BookProps,
+    context: string,
+    categoriesOptions?: category[]
+  }) => {
+
+  const [authorOptions, setAuthorOptions] = useState(authors ?? []);
+  const [isSubmiting, setIsSubmiting] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useAtom(isVisibleAtom);
   const [openModal, setOpenModal] = useState(false);
-  const [categoriesOptions, ] = useState([
-    { value: 'blue', label: 'Blue', closable: true , onClose: () => {} },
-    { value: 'red', label: 'Red', closable: true , onClose: () => {}  }
-  ]);
 
   const {
+    control,
     handleSubmit,
     formState: { errors },
-    control,
   } = useForm<BookProps>({
     resolver: zodResolver(bookSchema),
+    defaultValues: {
+      name: book?.name,
+      releaseDate: book?.releaseDate,
+      description: book?.description,
+      authorId: book?.authorId,
+      thumbnail: book?.thumbnail,
+      categories: book?.categories
+    },
   });
+  
+  console.log(errors.categories?.message);
+  
 
   const onSubmit = async (data: BookProps) => {
-    if (context === 'edit') {
-      await api.put(`/books/${book?.id}`, {...data, releaseDate: new Date(data.releaseDate).toISOString() });
+    if (isSubmiting) return;
+    setIsSubmiting(true);
+
+    if (context === 'edit' && book?.id) {
+      console.log('entrei no edit');
+      
+      await updateBook(
+        Number(book.id),
+        {...data, releaseDate: new Date(data.releaseDate),
+          thumbnail: data.thumbnail.startsWith('https://')
+            ? data.thumbnail
+            : `https://${data.thumbnail}`
+        });
+
+      setIsSubmiting(false);
       setOpenModal(true);
       return;
     }
 
-    await api.post('/books', {
-      ...data,
-      releaseDate: new Date(data.releaseDate).toISOString(),BookOutlined,
-      thumbnail: data.thumbnail.startsWith('https://') ? data.thumbnail : `https://${data.thumbnail}`,
-    });
+    await createBook(
+      {...data, releaseDate: new Date(data.releaseDate),
+        thumbnail: data.thumbnail.startsWith('https://')
+        ? data.thumbnail
+        : `https://${data.thumbnail}`
+      });
+
+    setIsSubmiting(false);
     setOpenModal(true);
   };
-
+  
   return (
     <>
       <div>
-        <form onSubmit={ handleSubmit(onSubmit) }className="flex flex-col gap-2">
+        <form onSubmit={ handleSubmit(onSubmit, (e) => console.log(e)) } className="flex flex-col gap-2">
           <div className="flex flex-col">
             <label htmlFor="name" className="text-white">Nome do Livro</label>
             <Controller
@@ -84,13 +100,15 @@ const RegisterBookForm = ({ authors, book, context }: {authors: AuthorProps[], b
                 <Input
                   id="name"
                   { ...field }
+                  status={ errors.name ? 'error' : '' }
+                  onChange={ (e) => field.onChange(e.target.value) }
                   placeholder="Nome do Livro"
-                  prefix={ <BookOutlined /> }
-                  value={ field.value ? field.value : book?.name }
+                  value={ field.value !== undefined ? field.value : book?.name }
                 />
-                ) }
+                )
+              }
             />
-            {errors.name && <span className="text-red-400">{errors.name.message}</span>}
+            {errors.name && <span className="text-red-400 flex items-center gap-2 mt-2"><ExclamationCircleOutlined />{errors.name.message}</span>}
           </div>
   
           <div className="flex flex-col">
@@ -103,44 +121,37 @@ const RegisterBookForm = ({ authors, book, context }: {authors: AuthorProps[], b
                   id="releaseDate"
                   placeholder="Selecione uma data"
                   picker="date"
+                  status={ errors.releaseDate ? 'error' : '' }
                   onChange={ (_value, dateString) => {
                     field.onChange(dateString);
                   } }
-                  value={ field.value ? dayjs(field.value) : dayjs(book?.releaseDate) }
+                  value={ field.value && dayjs(field.value) }
                 />
               ) }
             />
-            {errors.releaseDate && <span className="text-red-400">{errors.releaseDate.message}</span>}
+            {errors.releaseDate && <span className="text-red-400 flex items-center gap-2 mt-2"><ExclamationCircleOutlined />{errors.releaseDate.message}</span>}
           </div>
 
           <div className="flex flex-col">
-            <label htmlFor="category" className="text-white">Categoria</label>
+            <label htmlFor="categories" className="text-white">Categoria</label>
             <Controller
-              name="category"
+              name="categories"
               control={ control }
               render={ ({ field }) => (
-                <Select
-                  id="category"
-                  mode="multiple"
-                  showArrow
-                  tagRender={ tagRender }
-                  placeholder="Selecione uma categoria"
-                  optionFilterProp="children"
-                  filterOption={ (input, option) =>
-                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                  }
-                  defaultValue={ book?.category ? JSON.parse(book.category) : [] }
-                  onChange={ (value) => {
-                    field.onChange(JSON.stringify(value));
+                <SelectCategories
+                  categoriesOptions={ categoriesOptions }
+                  status={ errors.categories ? 'error' : '' }
+                  onChange={ (_value, option) => {
+                    
+                    field.onChange(option.length
+                      ? option.map((item: any) => ({...item, name: item.label, value: item.value }))
+                      : []);
+                    console.log(_value, option);
                   } }
-                  options={
-                    categoriesOptions.map((category) => ({value: category.value, label: category.label}))
-                  }
                 />
               ) }
             />
-
-            {errors.category && <span className="text-red-400">{errors.category.message}</span>}
+            {errors.categories && <span className="text-red-400 flex items-center gap-2 mt-2"><ExclamationCircleOutlined />{errors?.categories.message}</span>}
           </div>
 
           <div className="flex flex-col">
@@ -155,13 +166,14 @@ const RegisterBookForm = ({ authors, book, context }: {authors: AuthorProps[], b
                   id="description"
                   className="resize-none"
                   { ...field }
+                  status={ errors.description ? 'error' : '' }
+                  onChange={ (e) => field.onChange(e.target.value) }
                   placeholder="Descrição do Livro"
-                  value={ field.value ? field.value : book?.description }
                 />
               ) }
             />
             
-            {errors.description && <span className="text-red-400">{errors.description.message}</span>}
+            {errors.description && <span className="text-red-400 flex items-center gap-2 mt-2"><ExclamationCircleOutlined />{errors.description.message}</span>}
           </div>
 
           <div className="flex flex-col">
@@ -170,30 +182,19 @@ const RegisterBookForm = ({ authors, book, context }: {authors: AuthorProps[], b
               name="authorId"
               control={ control }
               render={ ({ field }) => (
-                <Select
-                  optionFilterProp="children"
-                  placeholder="Selecione um autor"
+                <SelectAuthors
+                  authorsOptions={ authorOptions }
+                  
                   status={ errors.authorId ? 'error' : '' }
                   onChange={ (value) => {
-                    setIsVisible(value === 'Outro');
-                    field.onChange(String(value));
+                    if (value === 'Outro') return setIsVisible(true);
+                    field.onChange(value);
                   } }
-                  defaultValue={ book?.authorId ? book.authorId : '' }
-                  filterOption={ (input, option) =>
-                    (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                  }
-                  options={ [
-                    ...authorOptions.map((author) => ({value: author.id, label: author.name})),
-                    {
-                      value: 'Outro',
-                      label: 'Outro'
-                    } ]
-                  }
                 />
               ) }
             />
 
-            {errors.authorId && <span className="text-red-400">{errors.authorId.message}</span>}
+            {errors.authorId && <span className="text-red-400 flex items-center gap-2 mt-2"><ExclamationCircleOutlined />{errors.authorId.message}</span>}
           </div>
 
           <div className="flex flex-col">
@@ -204,18 +205,19 @@ const RegisterBookForm = ({ authors, book, context }: {authors: AuthorProps[], b
               render={ ({ field }) => (
                 <Input
                   id="thumbnail"
-                  addonBefore={ <span className="bg-purple-900 text-white">https://</span> }
                   placeholder="URL da Capa"
+                  { ...field }
                   status={ errors.thumbnail ? 'error' : '' }
-                  onChange={ (e) => field.onChange(e.target.value) }
-                  value={ field.value ? field.value : book?.thumbnail.replace('https://', '') }
+                  onChange={ (e) => (
+                    field.onChange(e.target.value.startsWith('https://') ? e.target.value : `https://${e.target.value}`)
+                  ) }
+                  value={ field.value }
                 />
               ) }
             />
-            {errors.thumbnail && <span className="text-red-400">{errors.thumbnail.message}</span>}
+            {errors.thumbnail && <span className="text-red-400 flex items-center gap-2 mt-2"><ExclamationCircleOutlined />{errors.thumbnail.message}</span>}
           </div>
-
-          <RegisterButton context={ context } />
+          <RegisterButton disabled={ isSubmiting } context={ context } />
 
           {
           context !== 'edit' &&
@@ -242,49 +244,28 @@ const RegisterBookForm = ({ authors, book, context }: {authors: AuthorProps[], b
         }
 
       </div>
-      <div
-        className="
-        px-3 absolute text-white self-center w-1/2
-        bg-purple-900 border border-purple-700 gap-2 items-center
-        justify-center rounded-md py-2
-        flex flex-col md:w-1/2
-        "
-      >
-        <p className="flex items-center gap-2">
-          {context !== 'edit' ? 'Cadastrado com sucesso!' : 'Atualizado com sucesso!'}
-          <CheckCircleTwoTone twoToneColor="#52c41a" />
-        </p>
-        <div className="flex gap-2">
-          <Link href="/" className="underline text-green-600 hover:text-green-700 flex items-center gap-1">
-            <HomeOutlined />
-            Home
-          </Link>
-          <button
-            onClick={ () => setOpenModal(!openModal) }
-            className="underline text-green-600 hover:text-green-700"
-          >
-            Continuar Cadastrando
-          </button>
-        </div>
-
-      </div>
       {openModal && (
-      <div
-        className="
-        max-w-xs px-3 absolute m-0 text-white
-        bg-slate-200 flex gap-2 items-center
-        justify-center rounded-md py-2
-        "
-      >
-        <div>
-          {context !== 'edit' ? 'Cadastrado com sucesso!' : 'Atualizado com sucesso!'}
-          <CheckCircleTwoTone twoToneColor="#52c41a" />
-          <Link href="/">Home</Link>
-          <button onClick={ () => setOpenModal(!openModal) }>Continuar Cadastrando</button>
+        <div className="fixed top-0 left-0 w-full z-10 h-full bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white rounded-md flex flex-col gap-2 p-3">
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              {context !== 'edit' ? 'Cadastrado com sucesso!' : 'Atualizado com sucesso!'}
+              <CheckCircleTwoTone twoToneColor="#52c41a" />
+            </h1>
+            <div className="flex gap-2 justify-center items-center">
+              <Link href="/" className="underline text-green-600 hover:text-green-700 flex items-center gap-1">
+                <HomeOutlined />
+                Home
+              </Link>
+              <button
+                onClick={ () => setOpenModal(!openModal) }
+                className="underline text-green-600 hover:text-green-700"
+              >
+                Continuar Cadastrando
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
         )}
-      
     </>
   );
 };

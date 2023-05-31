@@ -1,5 +1,7 @@
 import React from 'react';
 
+export const revalidate = 60;
+
 export default function Layout({ children }: { children: React.ReactNode}) {
   return (
     <div className="flex min-h-screen py-3 items-center justify-center bg-green-600">
