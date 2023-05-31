@@ -61,6 +61,24 @@ export const getAuthorById = async (id: number): Promise<AuthorProps | undefined
   }
 };
 
+export const validateAuthor = async (name: string, birthDate: Date) => {
+  try {
+    await prisma.$connect();
+    const author = await prisma.author.findFirst({
+      where: {
+        name,
+        birthDate: new Date(birthDate),
+      },
+    });
+    return author;
+  } catch (err) {
+    console.log(err);
+
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
 export const createAuthor = async (data: AuthorProps) => {
   try {
     await prisma.$connect();
@@ -83,7 +101,6 @@ export const createAuthor = async (data: AuthorProps) => {
 
   } catch (err) {
     console.log(err);
-
   } finally {
     await prisma.$disconnect();
   }
@@ -221,6 +238,17 @@ export const getBookById = async (id: number): Promise<BookCardProps | undefined
 export const createBook = async (data: BookProps) => {
   try {
     await prisma.$connect();
+    const existingBook = await prisma.book.findFirst({
+      where: {
+        name: data.name,
+        authorId: Number(data.authorId),
+      },
+    });
+
+    if (existingBook) {
+      throw new Error('Livro já cadastrado!');
+    }
+
     const book = await prisma.book.create({
       data: {
         description: data.description,
@@ -228,12 +256,37 @@ export const createBook = async (data: BookProps) => {
         authorId: Number(data.authorId),
         releaseDate: data.releaseDate,
         thumbnail: data.thumbnail,
+        categories: {
+          connect: data.categories.map((category) => ({
+            id: Number(category.id),
+          })),
+        }
       },
     });
 
     return book;
   } catch (err) {
     console.log(err);
+    Promise.reject(err);
+    return null;
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const countBooks = async (where?: any) => {
+  const query: any = {};
+  try {
+    if (where) {
+      query['where'] = where;
+    }
+    await prisma.$connect();
+    const count = await prisma.book.count(query);
+
+    return count;
+  } catch (err) {
+    console.log(err);
+    return 0;
   } finally {
     await prisma.$disconnect();
   }
@@ -299,6 +352,33 @@ export const getBooksByAuthorId = async (id: number) => {
   } catch (err) {
     console.log(err);
 
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+export const getLimitedBooks = async (limit: number) => {
+  try {
+    await prisma.$connect();
+    const books = await prisma.book.findMany({
+      take: limit,
+      orderBy: {
+        id: 'desc',
+      },
+      select: {
+        id: true,
+        name: true,
+        thumbnail: true,
+      }
+    });
+
+    return books.map((book) => ({
+      ...book,
+      id: String(book.id),
+    }));
+  } catch (err) {
+    console.log(err);
+    return [];
   } finally {
     await prisma.$disconnect();
   }
