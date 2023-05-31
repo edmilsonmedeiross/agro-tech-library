@@ -1,6 +1,6 @@
 import React from 'react';
 
-function RegisterButton({context, disabled}: {context?: string, disabled: boolean}) {
+function RegisterButton({context, disabled}: {context?: string, disabled?: boolean}) {
   return (
     <div>
       <button
