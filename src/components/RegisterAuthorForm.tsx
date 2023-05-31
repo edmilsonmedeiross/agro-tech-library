@@ -1,23 +1,30 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AuthorSchema } from '@/validations/authorSchema';
-import { api } from '@/lib/api';
 import { useAtom } from 'jotai';
-import { isVisibleAtom } from '@/jotai/atoms';
+import { authorExistsAtom } from '@/jotai/atoms';
 import RegisterButton from './RegisterButton';
 import { DatePicker, Input } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
+import { createAuthor, validateAuthor } from '@/actions';
 
 interface AuthorFormData extends z.infer<typeof AuthorSchema> {
   id?: number;
 }
 
-const RegisterAuthorForm = ({ setAuthorOptions }: { setAuthorOptions?: any }) => {
-  const [, setIsVisible] = useAtom(isVisibleAtom);
+const RegisterAuthorForm = ({
+    setAuthorOptions, context
+  }: {
+    setAuthorOptions?: (nexs: any) => void,
+    context: string
+    }) => {
+
+  const [isVisible, setIsVisible] = useState(false);
+  const [authorExists, setAuthorExist] = useAtom(authorExistsAtom);
 
   const {
     control,
@@ -27,24 +34,33 @@ const RegisterAuthorForm = ({ setAuthorOptions }: { setAuthorOptions?: any }) =>
     resolver: zodResolver(AuthorSchema),
   });
 
+  const onSubmit = async (data: AuthorFormData)=> {
+    const authorExists = await validateAuthor(data.name, data.birthDate);
 
-  const onSubmit = (data: AuthorFormData)=> {
-    // Envie os dados do autor para onde você precisar
-    api.post('/author', {...data, birthDate: new Date(data.birthDate).toISOString()})
-      .then((newAuthor) => {
-        if (newAuthor.data) {
-          setAuthorOptions((prev: any) => [...prev, newAuthor.data]);
-          setIsVisible(false);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    if (authorExists) {
+      setIsVisible(true);
+      setAuthorExist(true);
+      return;
+    }
+    
+    const newAuthor = await createAuthor(data);
+    if (setAuthorOptions instanceof Function) setAuthorOptions((prev: any) => [...prev, newAuthor]);
+    setIsVisible(true);
   };
 
   return (
-    <div>
-      <h1 className="text-white">Cadastre o Autor</h1>
+    <div className="flex flex-col">
+      <h1 className="text-2xl text-white self-center font-bold" id="newAuthor">Cadastre o Autor</h1>
+
+      { isVisible && (
+        <div className="fixed top-0 left-0 w-full z-10 h-full bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white rounded-md flex flex-col gap-2 p-3">
+            <h1 className="text-2xl font-bold">{authorExists ? 'Autor Já Cadastrado' : 'Cadastrado com Sucesso!'}</h1>
+            <button onClick={ () => { setIsVisible(false); } } className="bg-green-500 text-white rounded-md px-3 py-1">Ok</button>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={ handleSubmit(onSubmit) } className="flex flex-col gap-2">
         <div className="flex flex-col gap-2">
           <label htmlFor="name" className="text-white">Nome</label>
@@ -100,7 +116,7 @@ const RegisterAuthorForm = ({ setAuthorOptions }: { setAuthorOptions?: any }) =>
           {errors.birthDate && <span>{ errors.birthDate.message }</span>}
         </div>
 
-        <RegisterButton />
+        <RegisterButton context={ context } />
       </form>
     </div>
   );

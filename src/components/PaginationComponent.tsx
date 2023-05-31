@@ -1,21 +1,22 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useAtom } from 'jotai';
-import { booksForRenderAtom } from '@/jotai/atoms';
-import { getBooksPerPage } from '@/actions';
+import { booksForRenderAtom, pageAtom, totalBooksAtom } from '@/jotai/atoms';
+import { getBooksPerPage, countBooks } from '@/actions';
 import BookCard from './BookCard';
+import { Pagination } from 'antd';
+import { ArrowRightOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 
 function PaginationComponent () {
   const [newBooksRender, setNewBooksRender] = useAtom(booksForRenderAtom);
-  const [page, setPage] = useState(1);
+  const [totalBooks, setTotalBooks] = useAtom(totalBooksAtom);
+  const [page, setPage] = useAtom(pageAtom);
+
   const pageSize = 10;
-  const total = newBooksRender.length;
-  console.log('total', total);
-  
 
   const fetchBooks = async () => {
-    const data = await getBooksPerPage(page, pageSize);
+    const [data, total] = await Promise.all([getBooksPerPage(page, pageSize), countBooks()]);
 
     if (!data) return;
     
@@ -23,8 +24,8 @@ function PaginationComponent () {
       setPage(prev => prev - 1);
     }
     setNewBooksRender(data);
+    setTotalBooks(total);
   };
-
 
   useEffect(() => {
     if (page < 1) {
@@ -43,26 +44,37 @@ function PaginationComponent () {
     setPage(prev => prev - 1);
   };
 
+  const PaginationComponent = () => {
+    return (
+      <div className="w-full flex justify-center items-center my-4">
+        <Pagination
+          className="bg-purple-700 p-1 rounded-lg border border-purple-400"
+          hideOnSinglePage
+          itemRender={ (page, type) => {
+            if (type === 'prev') {
+              return <Link href={ `?page=${page - 1}` } className="text-white" onClick={ handleClickPrev }><ArrowLeftOutlined /></Link>;
+            }
+            if (type === 'next') {
+              return <Link href={ `?page=${page + 1}` } className="text-white" onClick={ handleClickNext }><ArrowRightOutlined /></Link>;
+            }
+            return <Link href={ `?page=${page}` } onClick={ () => setPage(page) }>{ page }</Link>;
+          } }
+          current={ page }
+          defaultCurrent={ 1 }
+          pageSize={ pageSize }
+          total={ totalBooks }
+          onChange={ (page) => setPage(page) }
+        />
+      </div>
+    );
+  };
 
   return (
     <div>
-      {
-        total >= pageSize &&
-        <Link href={ `/?page=${page}` }>
-          <button type="button"onClick={ handleClickNext }>Next</button>
-        </Link>
-      }
-
-      {
-        page > 1 &&
-        <Link href={ `/?page=${page}` }>
-          <button type="button"onClick={ handleClickPrev }>Prev</button>
-        </Link>
-      }
+      <PaginationComponent />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
         {
-          newBooksRender
-          && newBooksRender.map((book) => (
+          newBooksRender && newBooksRender.map((book) => (
             <BookCard
               key={ book.id }
               book={ book }
@@ -70,19 +82,7 @@ function PaginationComponent () {
           ))
         }
       </div>
-      {
-        total >= pageSize &&
-        <Link href={ `/?page=${page}` }>
-          <button type="button"onClick={ handleClickNext }>Next</button>
-        </Link>
-      }
-
-      {
-        page > 1 &&
-        <Link href={ `/?page=${page}` }>
-          <button type="button"onClick={ handleClickPrev }>Prev</button>
-        </Link>
-      }
+      <PaginationComponent />
     </div>
   );
 }

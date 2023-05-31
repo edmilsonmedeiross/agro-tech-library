@@ -6,7 +6,6 @@ function error({ error, reset }: { error: Error; reset: () => void }) {
       <h1>Something went wrong</h1>
       <p>{error.message}</p>
       <button onClick={ reset }>Reset</button>
-
     </div>
   );
 }

@@ -14,6 +14,7 @@ function SelectCategories({ categoriesOptions, onChange, ...props }: SelectProps
     
     return (
       <Tag
+        key={ id }
         id={ id }
         color={ value }
         itemID={ id }
@@ -43,6 +44,7 @@ function SelectCategories({ categoriesOptions, onChange, ...props }: SelectProps
         }
         defaultValue={ [] }
         options={ categoriesOptions?.map((category) => ({
+          key: String(category.id),
           id: String(category.id),
           value: category.value,
           label: category.name,

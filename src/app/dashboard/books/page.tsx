@@ -7,7 +7,11 @@ async function Books() {
   return (
     <>
       <h1 className="text-2xl text-white self-center font-bold">Cadastre um Livro!</h1>
-      <RegisterBookForm authors={ authors } categoriesOptions={ categoriesOptions } context="register" />
+      <RegisterBookForm
+        authors={ authors }
+        categoriesOptions={ categoriesOptions }
+        context="register"
+      />
     </>
   );
 }

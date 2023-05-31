@@ -10,7 +10,6 @@ export const bookSchema = z.object({
   .refine((date) => !isNaN(date.getTime()), {
     message: 'A data de nascimento é inválida',
   }),
-  // author: z.string(),
   authorId: z.string(),
   thumbnail: z.string().url(),
   categories: z.array(z.object({

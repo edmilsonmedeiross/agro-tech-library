@@ -1,20 +1,29 @@
 'use client';
 import { AuthorProps } from '@/types/Author';
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import RegisterBookForm from './RegisterBookForm';
 import BookCard, { BookCardProps } from './BookCard';
 import SelectBooks from './SelectBooks';
 import { category } from '@prisma/client';
+import { useAtom } from 'jotai';
+import { bookForEditAtom } from '@/jotai/atoms';
 
 function SearchBook(props: {
   books?: BookCardProps[],
   authors: AuthorProps[] | undefined,
   categoriesOpitions: category[] | undefined,
-  context?: string,
+  context: string,
   book?: BookCardProps | null,
 }) {
 
-  const [bookForEdit, setBookForEdit] = useState<BookCardProps | undefined>(props.book || undefined);
+  const [bookForEdit, setBookForEdit] = useAtom(bookForEditAtom);
+
+  useEffect(() => {
+    if (props.book) {
+      setBookForEdit(props.book);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.book]);
 
   const onChange = async (value: string) => {
     console.log(`selected ${value}`);
@@ -39,7 +48,7 @@ function SearchBook(props: {
           <RegisterBookForm
             authors={ props.authors }
             book={ bookForEdit }
-            context={ 'edit' }
+            context={ props.context }
             categoriesOptions={ props.categoriesOpitions }
           />
         </div>

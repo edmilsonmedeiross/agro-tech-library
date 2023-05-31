@@ -41,7 +41,6 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
     });
   
     if (!existingAuthor) {
-      // Não existe um autor com o mesmo nome e data de nascimento
       return NextResponse.json({ message: 'autor não encontrado!' }, { status: 404 });
     }
 
@@ -72,7 +71,6 @@ export async function DELETE(request: NextRequest, context: { params: { id: stri
   });
   
   if (!existingAuthor) {
-    // Não existe um autor com o mesmo nome e data de nascimento
     return NextResponse.json({ message: 'autor não encontrado!' }, { status: 404 });
   }
 

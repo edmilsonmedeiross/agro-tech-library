@@ -19,6 +19,7 @@ export interface BookCardProps extends BookProps {
   categories: {
     id: string;
     name?: string;
+    value?: string;
   }[];
 }
 
@@ -31,10 +32,11 @@ function BookCard({book}: {book: BookCardProps}) {
     description,
     thumbnail,
     releaseDate,
-    author_fk: { name: authorName }
+    author_fk: { name: authorName },
+    categories,
   } = book;
-  
-  const date = releaseDate ? format(new Date(releaseDate), 'dd-MM-yyyy') : '';
+
+  const date = releaseDate ? format(new Date(releaseDate), 'dd/MM/yyyy') : '';
 
   const handleDeleteButton = async () => {
     setIsVisible(true);
@@ -58,17 +60,52 @@ function BookCard({book}: {book: BookCardProps}) {
         </div>
       ) }
       
-      <div>
-        <h4>{name}</h4>
-        <Image src={ thumbnail } alt={ name } width={ 240 } height={ 240 } />
-        <p>Data de lançamento: {date}</p>
-        <p>Autor: {authorName}</p>
-        <p>Descrição: {description}</p>
-      </div>
-     
-      <Link className="self-center text-center w-[240px] bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded hover:transition-colors duration-300" href={ `/dashboard/books/edit/${ book.id }` }>Editar</Link>
-      <button className="self-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-3 rounded w-[240px] hover:transition-colors duration-300" onClick={ handleDeleteButton }>Deletar Livro</button>
-
+      <a
+        href={ `/dashboard/books/${id}` }
+        className={ `flex flex-col bg-slate-100 ${window.location.pathname === '/' && 'hover:bg-purple-200 transition-all duration-300'} rounded-md p-4 gap-2 max-w-[300px] min-h-[630px] max-h-fit` }
+      >
+        <h4 className="self-center text-purple-900 font-medium text-xl capitalize">{name}</h4>
+        <Image
+          className="w-full h-[400px] rounded-md"
+          src={ thumbnail }
+          alt={ name }
+          width={ 200 }
+          height={ 400 }
+          priority
+        />
+        <div className="bg-slate-300 rounded-md p-2 flex-grow">
+          {window.location.pathname !== '/' && (
+            <>
+              <p className="text-purple-900 font-medium whitespace-normal break-words">
+                <span className="font-bold italic">Autor: </span>
+                {authorName}
+              </p>
+              <p className="text-purple-900 font-medium whitespace-normal break-words">
+                <span className="font-bold italic">Data de lançamento: </span>
+                {date}
+              </p>
+            </>
+          )}
+          <p className="text-purple-900 font-medium whitespace-normal break-words">
+            <span className="font-bold italic">Descrição:</span> {
+            window.location.pathname === '/' ? (
+              'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Doloremque deserunt est ab optio placeat animi commodi blanditiis libero non eos quaerat cumque, ullam nulla quod consequatur, autem dolorem, maxime perferendis!'.slice(0, 120)) : description }{'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Doloremque deserunt est ab optio placeat animi commodi blanditiis libero non eos quaerat cumque, ullam nulla quod consequatur, autem dolorem, maxime perferendis!'.length > 120 && window.location.pathname === '/' ? '...' : ''}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {categories.map((category) => (
+            <span key={ category.id } className={ `bg-${category?.value || 'purple'}-500 text-black rounded-md px-3 py-1` }>
+              {category.name}
+            </span>
+          ))}
+        </div>
+      </a>
+      {window.location.pathname !== '/' && (
+        <>
+          <Link className="self-center text-center w-full bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded hover:transition-colors duration-300" href={ `/dashboard/books/edit/${ book.id }` }>Editar Livro</Link>
+          <button className="self-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-3 rounded w-full hover:transition-colors duration-300" onClick={ handleDeleteButton }>Deletar Livro</button>
+        </>
+      )}
     </div>
   );
 }

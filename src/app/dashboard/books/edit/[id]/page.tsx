@@ -15,7 +15,7 @@ async function EditBookId({ params }: { params: { id: string }}) {
         book={ book }
         authors={ authors }
         categoriesOpitions={ categoriesOpitions }
-        context="edit"
+        context={ 'edit' }
       />
     </div>
   );

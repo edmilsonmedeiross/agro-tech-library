@@ -7,13 +7,13 @@ import RegisterAuthorForm from './RegisterAuthorForm';
 import { createBook, updateBook } from '@/actions';
 import SelectCategories from './SelectCategories';
 import { type BookProps } from '@/types/Book';
-import { isVisibleAtom } from '@/jotai/atoms';
+import { authorOptionsAtom, isSubmitingAtom, openModalAtom } from '@/jotai/atoms';
 import RegisterButton from './RegisterButton';
 import { AuthorProps } from '@/types/Author';
 import SelectAuthors from './SelectAuthors';
 import { category } from '@prisma/client';
 import { Input, DatePicker } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
 import Link from 'next/link';
 import dayjs from 'dayjs';
@@ -32,15 +32,24 @@ const RegisterBookForm = ({
     categoriesOptions?: category[]
   }) => {
 
-  const [authorOptions, setAuthorOptions] = useState(authors ?? []);
-  const [isSubmiting, setIsSubmiting] = useState<boolean>(false);
-  const [isVisible, setIsVisible] = useAtom(isVisibleAtom);
-  const [openModal, setOpenModal] = useState(false);
+  const [authorOptions, setAuthorOptions] = useAtom(authorOptionsAtom);
+  const [isSubmiting, setIsSubmiting] = useAtom(isSubmitingAtom);
+  const [isVisible, setIsVisible] = useState(false);
+  const [openModal, setOpenModal] = useAtom(openModalAtom);
+
+  useEffect(() => {
+    if (authors) {
+      setAuthorOptions(authors);
+    }
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  , []);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm<BookProps>({
     resolver: zodResolver(bookSchema),
     defaultValues: {
@@ -52,9 +61,6 @@ const RegisterBookForm = ({
       categories: book?.categories
     },
   });
-  
-  console.log(errors.categories?.message);
-  
 
   const onSubmit = async (data: BookProps) => {
     if (isSubmiting) return;
@@ -76,13 +82,21 @@ const RegisterBookForm = ({
       return;
     }
 
-    await createBook(
+    const isCreated = await createBook(
       {...data, releaseDate: new Date(data.releaseDate),
         thumbnail: data.thumbnail.startsWith('https://')
         ? data.thumbnail
         : `https://${data.thumbnail}`
       });
 
+    if (!isCreated) {
+      setIsSubmiting(false);
+      setError('name', {
+        type: 'manual',
+        message: 'Já existe um livro com este nome!',
+      });
+      return;
+    }
     setIsSubmiting(false);
     setOpenModal(true);
   };
@@ -184,11 +198,14 @@ const RegisterBookForm = ({
               render={ ({ field }) => (
                 <SelectAuthors
                   authorsOptions={ authorOptions }
-                  
                   status={ errors.authorId ? 'error' : '' }
                   onChange={ (value) => {
-                    if (value === 'Outro') return setIsVisible(true);
+                    if (value === 'Outro') {
+                      window.scrollTo(0, -1000);
+                      return setIsVisible(true);
+                    }
                     field.onChange(value);
+                    setIsVisible(false);
                   } }
                 />
               ) }
@@ -238,7 +255,7 @@ const RegisterBookForm = ({
         {
           isVisible && (
             <div>
-              <RegisterAuthorForm setAuthorOptions={ setAuthorOptions } />
+              <RegisterAuthorForm setAuthorOptions={ setAuthorOptions } context="register" />
             </div>
           )
         }

@@ -1,8 +1,6 @@
 'use client';
 import React from 'react';
 import { Carousel } from 'antd';
-import { useAtom } from 'jotai';
-import { booksForRenderAtom } from '@/jotai/atoms';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -14,13 +12,18 @@ const contentStyle: React.CSSProperties = {
   background: '#059666',
 };
 
-function CarouselComponent () {
-  const [newBooksRender, _setNewBooksRender] = useAtom(booksForRenderAtom);
+interface RenderBooksProps {
+  id: string;
+  name: string;
+  thumbnail: string;
+}
+
+function CarouselComponent ({ renderBooks }: {renderBooks: RenderBooksProps[]}) {
 
   return (
     <div>
-      <Carousel>
-        {newBooksRender.map((book) => (
+      <Carousel autoplay>
+        {renderBooks.map((book) => (
           <Link key={ book?.name } href={ `/dashboard/books/${book.id}` }>
             <div style={ contentStyle } className="relative bg-gradient-to-b from-transparent to-purple-500">
               <h1 className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-bold z-10 capitalize text-4xl text-white">{book?.name}</h1>

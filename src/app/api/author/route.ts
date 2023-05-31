@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingAuthor) {
-		// Já existe um autor com o mesmo nome e data de nascimento
       return NextResponse.json(
 			{ message: 'autor já cadastrado!' },
 			{ status: 409 }
