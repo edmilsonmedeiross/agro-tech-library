@@ -1,8 +1,8 @@
 import React from 'react';
 import './globals.css';
-import { Inter } from 'next/font/google';
+// import { Inter } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] });
+// const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
   title: 'Agro Tech Library',
@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning={ true }>
-      <body className={ inter.className } suppressHydrationWarning={ true }>
+      <body suppressHydrationWarning={ true }>
         {children}
       </body>
     </html>
