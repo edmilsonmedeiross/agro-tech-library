@@ -1,9 +1,7 @@
-'use client';
-
 import MenuSideBar from '@/components/MenuSideBar';
 
+async function DashBoard() {
 
-function DashBoard() {
   return (
     <div>
       <h1>Dashboard</h1>
