@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import './globals.css';
 import Header from '@/components/Header';
+import MenuMobile from '@/components/MenuMobile';
+import LoadingScreen from './loading';
 
 export const metadata = {
   title: 'Agro Tech Library',
@@ -15,8 +17,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning={ true }>
       <body suppressHydrationWarning={ true }>
+        <Suspense fallback={ <LoadingScreen /> }></Suspense>
         <Header />
+        <MenuMobile />
         {children}
+        <Suspense />
       </body>
     </html>
   );
