@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useAtom } from 'jotai';
 import { isVisibleEditModalAtom } from '@/jotai/atoms';
 import { api } from '@/lib/api';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export interface BookCardProps extends BookProps {
   author_fk: {
@@ -26,6 +26,7 @@ export interface BookCardProps extends BookProps {
 function BookCard({book}: {book: BookCardProps}) {
   const [isVisible, setIsVisible] = useAtom(isVisibleEditModalAtom);
   const pathname = usePathname();
+  const router = useRouter();
 
   const {
     id,
@@ -45,6 +46,8 @@ function BookCard({book}: {book: BookCardProps}) {
 
   const handleDeleteModal = async () => {
     await api.delete(`/books/${id}`);
+    setIsVisible(false);
+    router.push('/dashboard/books');
   };
 
   return (
@@ -95,7 +98,7 @@ function BookCard({book}: {book: BookCardProps}) {
         </div>
         <div className="flex flex-wrap gap-2">
           {categories.map((category) => (
-            <span key={ category.id } className={ `bg-${category?.value || 'purple'}-500 text-black rounded-md px-3 py-1` }>
+            <span key={ category.id } className={ `bg-${category?.value}-500 text-black rounded-md px-3 py-1` }>
               {category.name}
             </span>
           ))}
