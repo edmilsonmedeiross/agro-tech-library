@@ -22,6 +22,7 @@ Agro Tech Library é um sistema de gerenciamento de livraria que permite realiza
 O sistema Agro Tech Library oferece as seguintes funcionalidades:
 
 - Cadastro de livros: Adicione informações sobre novos livros à livraria.
+- Cadastro de Autores.
 - Listagem de livros: Visualize todos os livros disponíveis na livraria.
 - Atualização de livros: Edite as informações de um livro existente.
 - Exclusão de livros: Remova livros da livraria.
