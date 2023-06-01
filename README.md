@@ -61,3 +61,6 @@ npm install
 npm run dev
 ```
 5 - Abra o navegador e acesse http://localhost:3000 para visualizar o sistema de gerenciamento da livraria.
+
+![image](https://github.com/edmilsonmedeiross/agro-tech-library/assets/110620775/80d29f63-7ba7-49f1-b271-552c199065da)
+
