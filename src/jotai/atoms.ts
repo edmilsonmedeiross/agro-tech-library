@@ -1,4 +1,3 @@
-// import { BookCardProps } from '@/types/Book';
 import { type BookCardProps } from '@/components/BookCard';
 import { AuthorProps } from '@/types/Author';
 import { atom } from 'jotai';

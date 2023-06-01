@@ -66,7 +66,7 @@ function BookCard({book}: {book: BookCardProps}) {
       
       <a
         href={ `/dashboard/books/${id}` }
-        className={ `flex flex-col bg-slate-100 ${pathname === '/' && 'hover:bg-purple-200 transition-all duration-300'} rounded-md p-4 gap-2 max-w-[300px] min-h-[630px] max-h-fit` }
+        className={ `flex flex-col bg-slate-100 ${pathname === '/' && 'hover:bg-purple-200 transition-all duration-300'} rounded-md p-4 gap-2 max-w-[300px] min-h-[630px] h-full max-h-fit` }
       >
         <h4 className="self-center text-purple-900 font-medium text-xl capitalize">{name}</h4>
         <Image

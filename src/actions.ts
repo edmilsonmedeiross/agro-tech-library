@@ -271,7 +271,7 @@ export const createBook = async (data: BookProps) => {
     return book;
   } catch (err) {
     console.log(err);
-    Promise.reject(err);
+    await Promise.reject(err);
     return null;
   } finally {
     await prisma.$disconnect();

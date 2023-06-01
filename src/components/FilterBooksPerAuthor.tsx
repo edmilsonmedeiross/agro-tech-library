@@ -29,8 +29,8 @@ function FilterBooksPerAuthor({ authors }: { authors: AuthorProps[] | undefined 
     <div className="w-full flex items-center justify-center gap-2 mt-5 mb-5 max-sm:mt-12">
       <SelectAuthors
         authorsOptions={ authors }
-        onChange={ (value) => {
-          handleChange(value);
+        onChange={ async (value) => {
+          await handleChange(value);
         } }
       />
       <button type="button" className="bg-red-600 rounded-md p-1 text-white font-medium hover:bg-red-900" onClick={ handleReset }>Reset</button>
