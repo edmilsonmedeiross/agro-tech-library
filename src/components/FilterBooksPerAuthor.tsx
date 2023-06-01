@@ -32,6 +32,7 @@ function FilterBooksPerAuthor({ authors }: { authors: AuthorProps[] | undefined 
         onChange={ async (value) => {
           await handleChange(value);
         } }
+        className="flex-shrink"
       />
       <button type="button" className="bg-red-600 rounded-md p-1 text-white font-medium hover:bg-red-900" onClick={ handleReset }>Reset</button>
     </div>
