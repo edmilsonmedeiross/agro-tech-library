@@ -392,7 +392,11 @@ export const getCategories = async () => {
   try {
     await prisma.$connect();
 
-    const categories = await prisma.category.findMany();
+    const categories = await prisma.category.findMany({
+      orderBy: {
+        name: 'asc',
+      }
+    });
 
     return categories;
   } catch (err) {
