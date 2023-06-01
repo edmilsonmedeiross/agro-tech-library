@@ -20,3 +20,6 @@ export const bookForEditAtom = atom<BookCardProps | undefined>(undefined);
 
 // authorFormAtom
 export const authorExistsAtom = atom(false);
+
+// mobileMenuAtom
+export const isMobileMenuOpenAtom = atom(false);
