@@ -9,21 +9,21 @@ function MenuMobile() {
 
   return (
     <div>
-      {
-
-      isOpen
-      ?
-        <CloseOutlined
-          className="sm:hidden z-50 fixed top-2 right-2 text-gray-600 text-xl cursor-pointer font-bold"
-          onClick={ () => setIsOpen(!isOpen) }
-        />
-      :
-
-        <BarsOutlined
-          className="sm:hidden z-50 fixed top-2 right-2 text-gray-600 text-xl cursor-pointer font-bold"
-          onClick={ () => setIsOpen(!isOpen) }
-        />
-    }
+      <span className="bg-purple-800 rounded-full">
+        {
+          isOpen
+          ?
+            <CloseOutlined
+              className="sm:hidden z-50 fixed top-2 right-2 text-white text-xl cursor-pointer font-bold"
+              onClick={ () => setIsOpen(!isOpen) }
+            />
+          :
+            <BarsOutlined
+              className="sm:hidden z-50 fixed top-2 right-2 text-white text-xl cursor-pointer font-bold"
+              onClick={ () => setIsOpen(!isOpen) }
+            />
+        }
+      </span>
       {isOpen &&
       <div className="z-40 h-screen fixed overflow-y-hidden top-0 w-full bg-purple-950 transform translate-x-0 transition-transform ease-in-out duration-500">
         <nav className="w-full h-screen items-center justify-center flex flex-col gap-3 text-white">
