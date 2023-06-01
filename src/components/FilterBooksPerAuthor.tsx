@@ -26,15 +26,15 @@ function FilterBooksPerAuthor({ authors }: { authors: AuthorProps[] | undefined 
   };
 
   return (
-    <div className="w-full flex items-center justify-center gap-2 mt-5 mb-5 max-sm:mt-12">
+    <div className="w-full flex max-sm:flex-col p-5 items-center justify-center gap-2 max-sm:mt-12 bg-purple-950">
       <SelectAuthors
         authorsOptions={ authors }
         onChange={ async (value) => {
           await handleChange(value);
         } }
-        className="flex-shrink"
+        className="max-sm:w-full"
       />
-      <button type="button" className="bg-red-600 rounded-md p-1 text-white font-medium hover:bg-red-900" onClick={ handleReset }>Reset</button>
+      <button type="button" className="bg-red-600 max-sm:w-full rounded-md p-1 text-white font-medium hover:bg-red-900" onClick={ handleReset }>Reset</button>
     </div>
   );
 }
