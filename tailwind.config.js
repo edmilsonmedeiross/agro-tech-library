@@ -1,5 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-const colors = require('tailwindcss/colors');
 
 module.exports = {
   content: [
@@ -39,6 +38,25 @@ module.exports = {
           800:'#6e31aa',
           900:'#13111c',
         },
+      },
+      animation: {
+        'bubble-open': 'bubble-open 400ms ease-in-out',
+      },
+      keyframes: {
+        'bubble-open': {
+          from: {
+            visibility: 'hidden',
+            opacity: 0,
+            right: '-100%',
+            height: 0,
+          },
+          to: {
+            visibility: 'visible',
+            opacity: 1,
+            right: 0,
+            height: '100vmax',
+          },
+        }
       }
     },
   },
