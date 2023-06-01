@@ -28,7 +28,11 @@ export const getAuthors = async (): Promise<AuthorProps[] | undefined> => {
   try {
     await prisma.$connect();
 
-    const authors = await prisma.author.findMany();
+    const authors = await prisma.author.findMany({
+      orderBy: {
+        name: 'asc',
+      },
+    });
 
     return authors;
   } catch (err) {
