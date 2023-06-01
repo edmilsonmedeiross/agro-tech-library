@@ -22,7 +22,7 @@ function CarouselComponent ({ renderBooks }: {renderBooks: RenderBooksProps[]}) 
 
   return (
     <div>
-      <Carousel autoplay>
+      <Carousel autoplay className="overflow-hidden max-h-[400px]">
         {renderBooks.map((book) => (
           <Link key={ book?.name } href={ `/dashboard/books/${book.id}` }>
             <div style={ contentStyle } className="relative bg-gradient-to-b from-transparent to-purple-500">
