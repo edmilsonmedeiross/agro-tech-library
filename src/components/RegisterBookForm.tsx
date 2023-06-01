@@ -67,8 +67,6 @@ const RegisterBookForm = ({
     setIsSubmiting(true);
 
     if (context === 'edit' && book?.id) {
-      console.log('entrei no edit');
-      
       await updateBook(
         Number(book.id),
         {...data, releaseDate: new Date(data.releaseDate),
@@ -156,11 +154,11 @@ const RegisterBookForm = ({
                   categoriesOptions={ categoriesOptions }
                   status={ errors.categories ? 'error' : '' }
                   onChange={ (_value, option) => {
+                    console.log(option);
                     
                     field.onChange(option.length
                       ? option.map((item: any) => ({...item, name: item.label, value: item.value }))
                       : []);
-                    console.log(_value, option);
                   } }
                 />
               ) }
@@ -226,7 +224,7 @@ const RegisterBookForm = ({
                   { ...field }
                   status={ errors.thumbnail ? 'error' : '' }
                   onChange={ (e) => (
-                    field.onChange(e.target.value.startsWith('https://') ? e.target.value : `https://${e.target.value}`)
+                    field.onChange(e.target.value)
                   ) }
                   value={ field.value }
                 />

@@ -26,7 +26,6 @@ function SearchBook(props: {
   }, [props.book]);
 
   const onChange = async (value: string) => {
-    console.log(`selected ${value}`);
     if (props.books) {
       const book = props.books.find(({ id }) => id === value);
       setBookForEdit(book);

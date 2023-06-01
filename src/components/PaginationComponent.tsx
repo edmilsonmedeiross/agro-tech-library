@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAtom } from 'jotai';
 import { booksForRenderAtom, pageAtom, totalBooksAtom } from '@/jotai/atoms';
@@ -7,6 +7,7 @@ import { getBooksPerPage, countBooks } from '@/actions';
 import BookCard from './BookCard';
 import { Pagination } from 'antd';
 import { ArrowRightOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import LoadingScreen from '@/app/loading';
 
 function PaginationComponent () {
   const [newBooksRender, setNewBooksRender] = useAtom(booksForRenderAtom);
@@ -31,7 +32,6 @@ function PaginationComponent () {
     if (page < 1) {
       setPage(1);
     }
-  
     fetchBooks();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
@@ -44,7 +44,7 @@ function PaginationComponent () {
     setPage(prev => prev - 1);
   };
 
-  const PaginationComponent = () => {
+  const NewPaginationAntd = () => {
     return (
       <div className="w-full flex justify-center items-center my-4">
         <Pagination
@@ -71,18 +71,18 @@ function PaginationComponent () {
 
   return (
     <div>
-      <PaginationComponent />
+      <NewPaginationAntd />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
         {
-          newBooksRender && newBooksRender.map((book) => (
+          newBooksRender.length ? newBooksRender.map((book) => (
             <BookCard
               key={ book.id }
               book={ book }
             />
-          ))
+          )) : <LoadingScreen />
         }
       </div>
-      <PaginationComponent />
+      <NewPaginationAntd />
     </div>
   );
 }
