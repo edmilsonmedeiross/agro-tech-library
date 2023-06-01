@@ -8,6 +8,7 @@ import { useAtom } from 'jotai';
 import { isVisibleEditModalAtom } from '@/jotai/atoms';
 import { api } from '@/lib/api';
 import { usePathname, useRouter } from 'next/navigation';
+import TagRender from './SelectTagRender';
 
 export interface BookCardProps extends BookProps {
   author_fk: {
@@ -97,11 +98,16 @@ function BookCard({book}: {book: BookCardProps}) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {categories.map((category) => (
-            <span key={ category.id } className={ `bg-${category?.value}-500 text-black rounded-md px-3 py-1` }>
-              {category.name}
-            </span>
-          ))}
+          {
+            categories.map((category) => (
+              <TagRender
+                key={ category.id }
+                label={ category.name }
+                color={ category.value }
+                closable={ false }
+              />
+            ))
+          }
         </div>
       </a>
       {(!pathname.includes('edit') && pathname !== '/') && (
