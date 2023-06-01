@@ -9,7 +9,6 @@ export default async function Home(): Promise<React.JSX.Element> {
   
   return (
     <div className="flex flex-col bg-green-600 min-h-screen">
-      <h1>Agro Tech Library!</h1>
       <FilterBooksPerAuthor authors={ authors } />
       <CarouselComponent renderBooks={ carouselBooks } />
       <PaginationComponent />
