@@ -152,10 +152,9 @@ const RegisterBookForm = ({
               render={ ({ field }) => (
                 <SelectCategories
                   categoriesOptions={ categoriesOptions }
+                  defaultValue={ book?.categories }
                   status={ errors.categories ? 'error' : '' }
                   onChange={ (_value, option) => {
-                    console.log(option);
-                    
                     field.onChange(option.length
                       ? option.map((item: any) => ({...item, name: item.label, value: item.value }))
                       : []);
@@ -197,6 +196,7 @@ const RegisterBookForm = ({
                 <SelectAuthors
                   authorsOptions={ authorOptions }
                   status={ errors.authorId ? 'error' : '' }
+                  defaultValue={ book?.authorId }
                   onChange={ (value) => {
                     if (value === 'Outro') {
                       window.scrollTo(0, -1000);

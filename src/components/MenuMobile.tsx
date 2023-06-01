@@ -7,7 +7,6 @@ import Link from 'next/link';
 function MenuMobile() {
   const [isOpen, setIsOpen] = useAtom(isMobileMenuOpenAtom);
 
-
   return (
     <div>
       {
@@ -15,13 +14,13 @@ function MenuMobile() {
       isOpen
       ?
         <CloseOutlined
-          className="sm:hidden z-50 fixed top-2 right-2 text-gray-600 text-xl cursor-pointer"
+          className="sm:hidden z-50 fixed top-2 right-2 text-gray-600 text-xl cursor-pointer font-bold"
           onClick={ () => setIsOpen(!isOpen) }
         />
       :
 
         <BarsOutlined
-          className="sm:hidden z-50 fixed top-2 right-2 text-gray-600 text-xl cursor-pointer"
+          className="sm:hidden z-50 fixed top-2 right-2 text-gray-600 text-xl cursor-pointer font-bold"
           onClick={ () => setIsOpen(!isOpen) }
         />
     }

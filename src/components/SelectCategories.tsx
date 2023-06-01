@@ -3,10 +3,10 @@ import { category } from '@prisma/client';
 import { Select, SelectProps, Tag } from 'antd';
 import React from 'react';
 
-function SelectCategories({ categoriesOptions, onChange, ...props }: SelectProps & { categoriesOptions?: category[] }) {
+function SelectCategories({ categoriesOptions, onChange, defaultValue = [], ...props }: SelectProps & { categoriesOptions?: category[] }) {
 
   const tagRender = (props: any) => {
-    const { label, value, closable, onClose, id } = props;
+    const { label, id } = props;
     const onPreventMouseDown = (event: React.MouseEvent<HTMLSpanElement>) => {
       event.preventDefault();
       event.stopPropagation();
@@ -16,11 +16,8 @@ function SelectCategories({ categoriesOptions, onChange, ...props }: SelectProps
       <Tag
         key={ id }
         id={ id }
-        color={ value }
-        itemID={ id }
         onMouseDown={ onPreventMouseDown }
-        closable={ closable }
-        onClose={ onClose }
+        closable
         style={ { marginRight: 3 } }
       >
         {label}
@@ -39,14 +36,16 @@ function SelectCategories({ categoriesOptions, onChange, ...props }: SelectProps
         tagRender={ tagRender }
         placeholder="Selecione uma categoria"
         optionFilterProp="children"
-        filterOption={ (input, option) =>
-          (option?.name ?? '').toLowerCase().includes(input.toLowerCase())
-        }
-        defaultValue={ [] }
+        filterOption={ (input, option) => {
+          if (!option?.label) return false;
+          return (option?.label as string).toLowerCase().includes(input);
+        } }
+        defaultValue={ defaultValue }
         options={ categoriesOptions?.map((category) => ({
           key: String(category.id),
           id: String(category.id),
-          value: category.value,
+          value: category.id,
+          color: category.value,
           label: category.name,
         })) }
         { ...props }
