@@ -67,7 +67,7 @@ function BookCard({book}: {book: BookCardProps}) {
       
       <a
         href={ `/dashboard/books/${id}` }
-        className={ `flex flex-col bg-slate-100 ${pathname === '/' && 'hover:bg-purple-200 transition-all duration-300'} rounded-md p-4 gap-2 max-w-[300px] min-h-[630px] h-full max-h-fit` }
+        className={ `flex flex-col bg-slate-100 ${pathname === '/' && 'hover:bg-purple-200 transition-all duration-300'} rounded-md p-4 gap-2 max-w-[420px] w-full min-w-[320px] min-h-[630px] h-full max-h-fit` }
       >
         <h4 className="self-center text-purple-900 font-medium text-xl capitalize">{name}</h4>
         <Image
@@ -112,8 +112,10 @@ function BookCard({book}: {book: BookCardProps}) {
       </a>
       {(!pathname.includes('edit') && pathname !== '/') && (
         <>
+
           <Link className="self-center text-center w-full bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded hover:transition-colors duration-300" href={ `/dashboard/books/edit/${ book.id }` }>Editar Livro</Link>
           <button className="self-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-3 rounded w-full hover:transition-colors duration-300" onClick={ handleDeleteButton }>Deletar Livro</button>
+       
         </>
       )}
     </div>
