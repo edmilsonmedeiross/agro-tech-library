@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useAtom } from 'jotai';
 import { isVisibleEditModalAtom } from '@/jotai/atoms';
 import { api } from '@/lib/api';
-
+import { usePathname } from 'next/navigation';
 
 export interface BookCardProps extends BookProps {
   author_fk: {
@@ -25,6 +25,7 @@ export interface BookCardProps extends BookProps {
 
 function BookCard({book}: {book: BookCardProps}) {
   const [isVisible, setIsVisible] = useAtom(isVisibleEditModalAtom);
+  const pathname = usePathname();
 
   const {
     id,
@@ -62,7 +63,7 @@ function BookCard({book}: {book: BookCardProps}) {
       
       <a
         href={ `/dashboard/books/${id}` }
-        className={ `flex flex-col bg-slate-100 ${window.location.pathname === '/' && 'hover:bg-purple-200 transition-all duration-300'} rounded-md p-4 gap-2 max-w-[300px] min-h-[630px] max-h-fit` }
+        className={ `flex flex-col bg-slate-100 ${pathname === '/' && 'hover:bg-purple-200 transition-all duration-300'} rounded-md p-4 gap-2 max-w-[300px] min-h-[630px] max-h-fit` }
       >
         <h4 className="self-center text-purple-900 font-medium text-xl capitalize">{name}</h4>
         <Image
@@ -74,7 +75,7 @@ function BookCard({book}: {book: BookCardProps}) {
           priority
         />
         <div className="bg-slate-300 rounded-md p-2 flex-grow">
-          {window.location.pathname !== '/' && (
+          {pathname !== '/' && (
             <>
               <p className="text-purple-900 font-medium whitespace-normal break-words">
                 <span className="font-bold italic">Autor: </span>
@@ -88,8 +89,8 @@ function BookCard({book}: {book: BookCardProps}) {
           )}
           <p className="text-purple-900 font-medium whitespace-normal break-words">
             <span className="font-bold italic">Descrição:</span> {
-            window.location.pathname === '/' ? (
-              'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Doloremque deserunt est ab optio placeat animi commodi blanditiis libero non eos quaerat cumque, ullam nulla quod consequatur, autem dolorem, maxime perferendis!'.slice(0, 120)) : description }{'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Doloremque deserunt est ab optio placeat animi commodi blanditiis libero non eos quaerat cumque, ullam nulla quod consequatur, autem dolorem, maxime perferendis!'.length > 120 && window.location.pathname === '/' ? '...' : ''}
+            pathname === '/' ? (
+              description.slice(0, 120)) : description }{description.length > 120 && pathname === '/' ? '...' : ''}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -100,7 +101,7 @@ function BookCard({book}: {book: BookCardProps}) {
           ))}
         </div>
       </a>
-      {window.location.pathname !== '/' && (
+      {(!pathname.includes('edit') && pathname !== '/') && (
         <>
           <Link className="self-center text-center w-full bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded hover:transition-colors duration-300" href={ `/dashboard/books/edit/${ book.id }` }>Editar Livro</Link>
           <button className="self-center bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-3 rounded w-full hover:transition-colors duration-300" onClick={ handleDeleteButton }>Deletar Livro</button>
